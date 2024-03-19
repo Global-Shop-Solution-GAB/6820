@@ -1,0 +1,280 @@
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+V.Local.bPermissions.Declare
+V.Local.sPart.Declare
+V.Local.sQuery.Declare
+V.Local.fPrice.Declare
+V.Local.fQtePrice.Declare
+V.Local.fCost.Declare
+V.Local.sMsg.Declare
+V.Local.fRate.Declare
+
+F.ODBC.Connection!conx.OpenConnection(V.Ambient.PDSN,V.Ambient.PUser,V.Ambient.PPass)
+
+F.Global.Security.IsInGroup(V.Caller.User,"EditPO",V.Local.bPermissions)
+'PO Line Part Change
+F.Intrinsic.Control.If(V.Caller.Hook,=,17186)
+	F.Intrinsic.Control.If(V.Local.bPermissions,=,False)
+		V.Local.sPart.Set(Variable.Passed.000008)
+		F.Intrinsic.String.RPad(V.Local.sPart," ",17,V.Local.sPart)
+		F.Intrinsic.String.Build("{0}{1}",V.Local.sPart,Variable.Passed.000009,V.Local.sPart)
+		F.Intrinsic.String.Build("SELECT * FROM V_INVENTORY_MSTR WHERE PART = '{0}' and location = '{1}'", V.Local.sPart, Variable.Passed.000011, V.Local.sQuery)
+		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.sQuery)
+		F.Intrinsic.Control.If(V.ODBC.conx!rst.EOF,=,False)
+			F.Intrinsic.String.Build("SELECT * FROM V_VEND_QTE_HEADER WHERE PART = '{0}'", V.Local.sPart, Variable.Passed.000011, V.Local.sQuery)
+			F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstQte",V.Local.sQuery)
+			F.Intrinsic.Control.If(V.ODBC.conx!rstQte.EOF,=,False)		
+''			F.Intrinsic.Debug.ShowCallerInfo
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",1)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",0)
+				F.Intrinsic.Control.EndIf
+			F.ODBC.conx!rstQte.Close
+		F.Intrinsic.Control.Else
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",0)
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conx!rst.Close
+	F.Intrinsic.Control.Else	
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",0)
+	F.Intrinsic.Control.EndIf
+
+'PO Line Populate
+F.Intrinsic.Control.ElseIf(V.Caller.Hook,=,17050)
+	F.Intrinsic.Control.If(V.Local.bPermissions,=,False)
+		V.Local.sPart.Set(Variable.Passed.000008)
+		F.Intrinsic.String.RPad(V.Local.sPart," ",17,V.Local.sPart)
+		F.Intrinsic.String.Build("{0}{1}",V.Local.sPart,Variable.Passed.000009,V.Local.sPart)
+		F.Intrinsic.String.Build("SELECT * FROM V_INVENTORY_MSTR WHERE PART = '{0}' and location = '{1}'", V.Local.sPart, Variable.Passed.000011, V.Local.sQuery)
+		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.sQuery)
+		F.Intrinsic.Control.If(V.ODBC.conx!rst.EOF,=,False)
+			F.Intrinsic.String.Build("SELECT * FROM V_VEND_QTE_HEADER WHERE PART = '{0}'", V.Local.sPart, Variable.Passed.000011, V.Local.sQuery)
+			F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstQte",V.Local.sQuery)
+			F.Intrinsic.Control.If(V.ODBC.conx!rstQte.EOF,=,False)		
+''			F.Intrinsic.Debug.ShowCallerInfo
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",1)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",1)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",0)
+				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",0)
+				F.Intrinsic.Control.EndIf
+			F.ODBC.conx!rstQte.Close
+		F.Intrinsic.Control.Else
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",0)
+			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",0)
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conx!rst.Close
+	F.Intrinsic.Control.Else	
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000022,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000046,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000111,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000114,"LOCK",0)
+		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000025,"LOCK",0)
+	F.Intrinsic.Control.EndIf	
+
+'Purchase Requistion Part Change	
+F.Intrinsic.Control.ElseIf(V.Caller.Hook,=,16200)
+	F.Intrinsic.Control.If(V.Local.bPermissions,=,False)
+		V.Local.sPart.Set(Variable.Passed.000013)
+		F.Intrinsic.String.Rpad(V.Local.sPart," ",17,V.Local.sPart)
+		F.Intrinsic.String.Build("{0}{1}",V.Local.sPart,Variable.Passed.000014,V.Local.sPart)
+		F.Intrinsic.String.Build("SELECT * FROM V_INVENTORY_MSTR WHERE PART = '{0}' and location = '{1}'",V.Local.sPart,Variable.Passed.000016,V.Local.sQuery)
+		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.sQuery)
+		F.Intrinsic.Control.If(V.ODBC.conx!rst.EOF,=,False)
+			F.Intrinsic.String.Build("SELECT * FROM V_VEND_QTE_HEADER WHERE PART = '{0}'",V.Local.sPart,Variable.Passed.000016,V.Local.sQuery)
+			F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstQte",V.Local.sQuery)
+			F.Intrinsic.Control.If(V.ODBC.conx!rstQte.EOF,=,False)
+				F.Intrinsic.UI.Msgbox("Vendor Quote exists!")			
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",1)
+'				V.Local.fCost.Set(V.Passed.000052)
+'				F.Intrinsic.Control.If(V.Local.fCost,<>,0)
+'					F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",1)
+'				F.Intrinsic.Control.EndIf	
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",1)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",1)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",1)
+''				V.Local.fCost.Set(V.Passed.000050)
+''				V.Passed.000050.Set(V.Local.fCost)
+'			F.Intrinsic.Control.Else
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",0)
+			F.Intrinsic.Control.EndIf
+			F.ODBC.conx!rstQte.Close
+'		F.Intrinsic.Control.Else
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",0)
+		F.Intrinsic.Control.EndIf
+'		F.ODBC.conx!rst.Close
+'	F.Intrinsic.Control.Else
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",0)
+	F.Intrinsic.Control.EndIf
+
+'PR Line Load Line
+'F.Intrinsic.Control.ElseIf(V.Caller.Hook,=,16246)
+'	F.Intrinsic.Control.If(V.Local.bPermissions,=,False)
+'		V.Local.sPart.Set(Variable.Passed.000013)
+'		F.Intrinsic.String.Rpad(V.Local.sPart," ",17,V.Local.sPart)
+'		F.Intrinsic.String.Build("{0}{1}",V.Local.sPart,Variable.Passed.000014,V.Local.sPart)
+'		F.Intrinsic.String.Build("SELECT * FROM V_INVENTORY_MSTR WHERE PART = '{0}' and location = '{1}'",V.Local.sPart,Variable.Passed.000016,V.Local.sQuery)
+'		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.sQuery)
+'		F.Intrinsic.Control.If(V.ODBC.conx!rst.EOF,=,False)
+'			F.Intrinsic.String.Build("SELECT * FROM V_VEND_QTE_HEADER WHERE PART = '{0}'",V.Local.sPart,Variable.Passed.000016,V.Local.sQuery)
+'			F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstQte",V.Local.sQuery)
+'			F.Intrinsic.Control.If(V.ODBC.conx!rstQte.EOF,=,False)	
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",1)
+'				V.Local.fCost.Set(V.Passed.000052)
+'				F.Intrinsic.Control.If(V.Local.fCost,<>,0)
+'					F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",1)
+'				F.Intrinsic.Control.EndIf
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",1)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",1)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",1)
+'			F.Intrinsic.Control.Else
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",0)
+'				F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",0)
+'			F.Intrinsic.Control.EndIf
+'			F.ODBC.conx!rstQte.Close
+'		F.Intrinsic.Control.Else
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",0)
+'			F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",0)
+'		F.Intrinsic.Control.EndIf
+'		F.ODBC.conx!rst.Close
+'	F.Intrinsic.Control.Else
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000050,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000054,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000058,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000176,"LOCK",0)
+'		F.Intrinsic.UI.ChangeCallerProperty(V.Passed.000213,"LOCK",0)
+'	F.Intrinsic.Control.EndIf	
+
+'PR Line Save Line button
+F.Intrinsic.Control.ElseIf(V.Caller.Hook,=,16242)
+	F.Intrinsic.Control.If(V.Local.bPermissions,=,False)
+		V.Local.sPart.Set(Variable.Passed.000013)
+		F.Intrinsic.String.Rpad(V.Local.sPart," ",17,V.Local.sPart)
+		F.Intrinsic.String.Build("{0}{1}",V.Local.sPart,Variable.Passed.000014,V.Local.sPart)
+		F.Intrinsic.String.Build("SELECT * FROM V_INVENTORY_MSTR WHERE PART = '{0}'", V.Local.sPart, V.Local.sQuery)
+		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.sQuery)
+		F.Intrinsic.Control.If(V.ODBC.conx!rst.EOF,=,False)
+			F.Intrinsic.String.Build("SELECT * FROM V_VEND_QTE_HEADER WHERE PART = '{0}';", V.Local.sPart, V.Local.sQuery)
+			F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstCheck",V.Local.sQuery)
+			F.Intrinsic.Control.If(V.ODBC.conx!rstCheck.EOF,=,False)
+				F.Intrinsic.String.Build("SELECT TOP 1 B.QUANTITY, A.Part, A.Vendor, A.Seq, B.UNIT_PRICE FROM V_VEND_QTE_HEADER A left join V_VEND_QTE_LINES B ON A.PART = B.PART AND A.SEQ = B.SEQ WHERE A.PART = '{0}' AND A.VENDOR = '{1}' AND B.QUANTITY <= {2} ORDER BY QUANTITY DESC;", V.Local.sPart, Variable.Passed.000033, Variable.Passed.000048, V.Local.sQuery)
+				F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstQte",V.Local.sQuery)
+				F.Intrinsic.Control.If(V.ODBC.conx!rstQte.EOF,=,False)
+					V.Local.fRate.Set(Variable.Passed.000052)
+					F.Intrinsic.Control.If(V.Local.fRate,=,0)
+						V.Local.fPrice.Set(Variable.Passed.000050)
+					F.Intrinsic.Control.Else
+						V.Local.fPrice.Set(Variable.Passed.000054)
+					F.Intrinsic.Control.EndIf
+					
+					V.Local.fQtePrice.Set(V.ODBC.conx!rstQte.FieldValFLoat!UNIT_PRICE)
+					'f.Intrinsic.Debug.ShowCallerInfo
+					F.Intrinsic.Control.If(V.Local.fQtePrice,<>,V.Local.fPrice)
+						V.Passed.777777.Set(1)				
+						F.Intrinsic.UI.Msgbox("The entered price is not equal to the Vendor Quote's price. Please click on Vendor Quote button and select the correct price. ")
+					F.Intrinsic.Control.EndIf
+				F.Intrinsic.Control.Else
+					V.Passed.777777.Set(1)
+					F.Intrinsic.String.Build("Vendor Quote of vendor {0} is not found! Please select an existing vendor quote",Variable.Passed.000035,V.Local.sMsg)
+					F.Intrinsic.UI.Msgbox(V.Local.sMsg)	
+				F.Intrinsic.Control.EndIf
+				F.ODBC.conx!rstQte.Close
+			F.Intrinsic.Control.EndIf
+			F.ODBC.conx!rstCheck.Close
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conx!rst.Close
+	F.Intrinsic.Control.EndIf
+
+
+'Block Display By WO option on Automated Purchasing screen
+F.Intrinsic.Control.ElseIf(V.Caller.Hook,=,16942)
+	F.Intrinsic.Control.If(V.Local.bPermissions,=,False)
+		Variable.passed.000041.set("N")
+		Function.Intrinsic.UI.ChangeCallerProperty(variable.passed.000041, "LOCK", 1)
+	F.Intrinsic.Control.EndIf
+
+'Automated PO Screen
+F.Intrinsic.Control.ElseIf(V.Caller.Hook,=,34433)
+	F.Intrinsic.Control.If(V.Local.bPermissions,=,False)
+		V.Local.sPart.Set(Variable.Passed.000001)
+		F.Intrinsic.String.Rpad(V.Local.sPart," ",17,V.Local.sPart)
+		F.Intrinsic.String.Build("{0}{1}",V.Local.sPart,Variable.Passed.000206,V.Local.sPart)
+		F.Intrinsic.String.Build("SELECT * FROM V_INVENTORY_MSTR WHERE PART = '{0}'", V.Local.sPart, Variable.Passed.000011, V.Local.sQuery)
+		F.ODBC.Connection!conx.OpenLocalRecordsetRO("rst",V.Local.sQuery)
+		F.Intrinsic.Control.If(V.ODBC.conx!rst.EOF,=,False)
+			F.Intrinsic.String.Build("SELECT TOP 1 B.QUANTITY, A.Part, A.Vendor, A.Seq, B.UNIT_PRICE FROM V_VEND_QTE_HEADER A left join V_VEND_QTE_LINES B ON A.PART = B.PART AND A.SEQ = B.SEQ WHERE A.PART = '{0}' AND A.VENDOR = '{1}' AND B.QUANTITY <= {2} ORDER BY QUANTITY DESC;", V.Local.sPart, Variable.Passed.000083, Variable.Passed.000007, V.Local.sQuery)
+			F.ODBC.Connection!conx.OpenLocalRecordsetRO("rstQte",V.Local.sQuery)
+			F.Intrinsic.Control.If(V.ODBC.conx!rstQte.EOF,=,False)
+				F.Intrinsic.Control.If(Variable.Passed.000119,=,0)
+					V.Local.fPrice.Set(Variable.Passed.000088)
+				F.Intrinsic.Control.Else
+					V.Local.fPrice.Set(Variable.Passed.000082)
+				F.Intrinsic.Control.EndIf
+				
+				V.Local.fQtePrice.Set(V.ODBC.conx!rstQte.FieldValFLoat!UNIT_PRICE)
+				'f.Intrinsic.Debug.ShowCallerInfo
+				F.Intrinsic.Control.If(V.Local.fQtePrice,<>,V.Local.fPrice)
+					V.Passed.777777.Set(1)				
+					F.Intrinsic.UI.Msgbox("The entered price is not equal to the Vendor Quote's price. Please click on Vendor Quote button and select the correct price. ")
+				F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.EndIf
+			F.ODBC.conx!rstQte.Close
+		F.Intrinsic.Control.EndIf
+		F.ODBC.conx!rst.Close
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.EndIf
+
+F.ODBC.Connection!conx.Close
+F.Intrinsic.Control.End
+Program.Sub.Main.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.8210.19558$}$1
+${$6$}$dyunus$}$20220704131429461$}$xZ6SHi8g7O0Qsxe6AiO2NH3PnOKQRy0T19SKaEjgaXMiwLtQBGYXElPSdaYGmmwgCrTyd4i+c4I=
+Program.Sub.Comments.End
